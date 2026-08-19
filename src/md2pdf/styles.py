@@ -1,0 +1,125 @@
+"""
+Styles and color definitions for md2pdf.
+"""
+
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
+def get_custom_styles():
+    styles = getSampleStyleSheet()
+
+    styles.add(ParagraphStyle(
+        'CustomH1',
+        parent=styles['Heading1'],
+        fontName='Helvetica-Bold',
+        fontSize=17,
+        leading=21,
+        textColor=colors.HexColor("#1a73e8"),
+        spaceAfter=4,
+    ))
+    styles.add(ParagraphStyle(
+        'CustomH2',
+        parent=styles['Heading2'],
+        fontName='Helvetica-Bold',
+        fontSize=12.5,
+        leading=15.5,
+        textColor=colors.HexColor("#202124"),
+        spaceBefore=6,
+        spaceAfter=3,
+    ))
+    styles.add(ParagraphStyle(
+        'CustomH3',
+        parent=styles['Heading3'],
+        fontName='Helvetica-Bold',
+        fontSize=10,
+        leading=13,
+        textColor=colors.HexColor("#1967d2"),
+        spaceBefore=4,
+        spaceAfter=2,
+    ))
+    styles.add(ParagraphStyle(
+        'CustomH4',
+        parent=styles['Heading4'],
+        fontName='Helvetica-Bold',
+        fontSize=9,
+        leading=11.5,
+        textColor=colors.HexColor("#3c4043"),
+        spaceBefore=3,
+        spaceAfter=1,
+    ))
+    styles.add(ParagraphStyle(
+        'CustomBody',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8.5,
+        leading=11.5,
+        textColor=colors.HexColor("#202124"),
+        spaceAfter=2,
+    ))
+    styles.add(ParagraphStyle(
+        'CustomBullet',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.HexColor("#202124"),
+        leftIndent=12,
+        firstLineIndent=-8,
+        spaceAfter=1.5,
+    ))
+    styles.add(ParagraphStyle(
+        'CustomBullet2',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.HexColor("#202124"),
+        leftIndent=24,
+        firstLineIndent=-8,
+        spaceAfter=1.5,
+    ))
+    styles.add(ParagraphStyle(
+        'CustomNumberedList',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.HexColor("#202124"),
+        leftIndent=14,
+        firstLineIndent=-10,
+        spaceAfter=1.5,
+    ))
+    styles.add(ParagraphStyle(
+        'CustomTableHeader',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=7.5,
+        leading=9.5,
+        textColor=colors.HexColor("#1a73e8"),
+    ))
+    styles.add(ParagraphStyle(
+        'CustomTableCell',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=7.5,
+        leading=9.5,
+        textColor=colors.HexColor("#202124"),
+    ))
+    styles.add(ParagraphStyle(
+        'CustomCodeBlock',
+        parent=styles['Normal'],
+        fontName='Courier',
+        fontSize=7,
+        leading=8.5,
+        textColor=colors.HexColor("#202124"),
+    ))
+    styles.add(ParagraphStyle(
+        'CustomBlockquote',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor("#5f6368"),
+    ))
+
+    return styles
