@@ -98,25 +98,35 @@ options:
 
 ## 🎨 Mermaid Diagram Authoring Guidelines
 
-To ensure 100% diagram compilation without HTTP 400 bad requests from diagram backends:
+When writing Markdown for `md2pdf`, write standard Mermaid blocks starting with a diagram type (e.g. `flowchart TB`, `sequenceDiagram`, `classDiagram`):
 
-1. **Subgraphs**: Use plain square brackets without quotes:
-   ```mermaid
+```mermaid
+flowchart TB
+    Client[Web UI / Client] --> Gateway[API Gateway]
+    Gateway --> Router[Agency Router]
+    Router --> Host[Go Actor Host]
+    Host --> Sandbox[VMaaS Container]
+```
+
+### Syntax Best Practices for Reliable Rendering
+
+1. **Subgraphs**: Use plain square brackets without internal quotes:
+   ```text
    subgraph ClientTier [1. Client and Ingestion Tier]
        UI[Web UI]
    end
    ```
-   *(Avoid `subgraph ClientTier ["1. Client Tier"]`)*.
+   *(Avoid `subgraph ClientTier ["1. Client Tier"]` which triggers API syntax errors).*
 
 2. **Edge Labels**: Avoid raw parentheses inside edge text delimiters:
-   ```mermaid
+   ```text
    A -->|Stage: ACTIVE / ON-HOLD| B
    ```
    *(Avoid `A -->|Stage (ACTIVE / ON-HOLD)| B`)*.
 
-3. **Comparison Symbols**: Avoid raw `<` characters inside node labels (they get parsed as unclosed HTML tags). Use `under 500ms` or `&lt;500ms` instead of `<500ms`.
+3. **Comparison Symbols**: Avoid raw `<` characters inside node labels (parsers interpret them as unclosed HTML tags). Use `under 500ms` or `&lt;500ms` instead of `<500ms`.
 
-4. **Node Shapes**: For paths and directories, avoid unclosed single slashes like `Node[/workspace]`. Use standard quoted nodes `Node["workspace Directory"]` or double-slashed parallelograms `Node[/workspace/]`.
+4. **Node Shapes**: For filesystem paths and directories, avoid unclosed single slashes like `Node[/workspace]`. Use standard quoted nodes `Node["workspace Directory"]` or double-slashed parallelograms `Node[/workspace/]`.
 
 ---
 
