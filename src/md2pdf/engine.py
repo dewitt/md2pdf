@@ -136,16 +136,21 @@ def parse_markdown_to_flowables(md_text, styles):
                 code_lines.append(lines[i])
                 i += 1
             i += 1
-            code_text = '\n'.join(code_lines)
-            code_escaped = code_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            chunk_size = 20
+            chunks = [code_lines[j:j+chunk_size] for j in range(0, len(code_lines), chunk_size)] if code_lines else [[]]
+            table_cells = []
+            for chunk in chunks:
+                chunk_text = '\n'.join(chunk)
+                code_escaped = chunk_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                p = Paragraph(f"<font face='Courier' size='7'>{code_escaped.replace('\n', '<br/>').replace(' ', '&nbsp;')}</font>", styles['CustomCodeBlock'])
+                table_cells.append([p])
             
-            p = Paragraph(f"<font face='Courier' size='7'>{code_escaped.replace('\n', '<br/>').replace(' ', '&nbsp;')}</font>", styles['CustomCodeBlock'])
-            t = Table([[p]], colWidths=[530])
+            t = Table(table_cells, colWidths=[530])
             t.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#f8f9fa")),
                 ('BOX', (0, 0), (-1, -1), 0.5, colors.HexColor("#dadce0")),
-                ('TOPPADDING', (0, 0), (-1, -1), 5),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+                ('TOPPADDING', (0, 0), (-1, -1), 3),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
                 ('LEFTPADDING', (0, 0), (-1, -1), 7),
                 ('RIGHTPADDING', (0, 0), (-1, -1), 7),
             ]))
