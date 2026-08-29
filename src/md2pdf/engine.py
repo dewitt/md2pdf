@@ -18,7 +18,7 @@ from reportlab.platypus import (
 from reportlab.pdfgen import canvas
 from PIL import Image as PILImage
 
-from .styles import get_custom_styles
+from .styles import get_custom_styles, get_font_names, register_system_fonts
 
 class NumberedCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
@@ -39,7 +39,8 @@ class NumberedCanvas(canvas.Canvas):
 
     def draw_header_footer(self, page_count):
         self.saveState()
-        self.setFont("Helvetica", 8)
+        sans_font, sans_bold, mono_font, mono_bold = get_font_names()
+        self.setFont(sans_font, 8)
         self.setFillColor(colors.HexColor("#5f6368"))
         
         # Header (pages after first)
@@ -78,7 +79,17 @@ def fetch_mermaid_png(mermaid_code):
         return None
 
 def clean_inline_md(text):
+    sans_font, sans_bold, mono_font, mono_bold = get_font_names()
     text = text.replace("<br/>", "___BR___").replace("<br>", "___BR___")
+    
+    # Replace LaTeX/math arrows and tokens
+    text = (text.replace(r'$\rightarrow$', '→')
+                .replace(r'$\leftarrow$', '←')
+                .replace(r'$\leftrightarrow$', '↔')
+                .replace(r'$\Rightarrow$', '⇒')
+                .replace(r'$\Leftarrow$', '⇐')
+                .replace(r'$\Leftrightarrow$', '⇔'))
+                
     text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     text = text.replace("___BR___", "<br/>")
     
@@ -87,7 +98,7 @@ def clean_inline_md(text):
     # Italic: *text*
     text = re.sub(r'(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)', r'<i>\1</i>', text)
     # Inline code: `code`
-    text = re.sub(r'`(.+?)`', r'<font face="Courier" color="#c5221f" size="8"><b>\1</b></font>', text)
+    text = re.sub(r'`(.+?)`', rf'<font face="{mono_font}" color="#c5221f" size="8"><b>\1</b></font>', text)
     # Markdown links: [text](url)
     text = re.sub(r'\[(.+?)\]\((.+?)\)', r'<font color="#1a73e8"><u>\1</u></font>', text)
     return text
@@ -136,13 +147,32 @@ def parse_markdown_to_flowables(md_text, styles):
                 code_lines.append(lines[i])
                 i += 1
             i += 1
-            chunk_size = 20
+            
+            sans_font, sans_bold, mono_font, mono_bold = get_font_names()
+            max_line_len = max((len(l) for l in code_lines), default=0)
+            if max_line_len > 115:
+                font_size = 5.2
+                leading = 6.8
+            elif max_line_len > 95:
+                font_size = 6.0
+                leading = 7.6
+            elif max_line_len > 80:
+                font_size = 6.5
+                leading = 8.0
+            else:
+                font_size = 7.0
+                leading = 8.5
+
+            chunk_size = 25
             chunks = [code_lines[j:j+chunk_size] for j in range(0, len(code_lines), chunk_size)] if code_lines else [[]]
             table_cells = []
             for chunk in chunks:
                 chunk_text = '\n'.join(chunk)
+                chunk_text = (chunk_text.replace(r'$\rightarrow$', '→')
+                                        .replace(r'$\leftarrow$', '←')
+                                        .replace(r'$\leftrightarrow$', '↔'))
                 code_escaped = chunk_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-                p = Paragraph(f"<font face='Courier' size='7'>{code_escaped.replace('\n', '<br/>').replace(' ', '&nbsp;')}</font>", styles['CustomCodeBlock'])
+                p = Paragraph(f"<font face='{mono_font}' size='{font_size}'>{code_escaped.replace(chr(10), '<br/>').replace(' ', '&nbsp;')}</font>", styles['CustomCodeBlock'])
                 table_cells.append([p])
             
             t = Table(table_cells, colWidths=[530])
@@ -151,8 +181,8 @@ def parse_markdown_to_flowables(md_text, styles):
                 ('BOX', (0, 0), (-1, -1), 0.5, colors.HexColor("#dadce0")),
                 ('TOPPADDING', (0, 0), (-1, -1), 3),
                 ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-                ('LEFTPADDING', (0, 0), (-1, -1), 7),
-                ('RIGHTPADDING', (0, 0), (-1, -1), 7),
+                ('LEFTPADDING', (0, 0), (-1, -1), 6),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 6),
             ]))
             flowables.append(Spacer(1, 4))
             flowables.append(t)
